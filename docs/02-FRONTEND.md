@@ -1,4 +1,4 @@
-# 02 — Frontend build spec
+# 02 · Frontend build spec
 
 Dune · CloudSmiths · First Commit (AWS x WeMakeDevs)
 
@@ -23,17 +23,13 @@ No state management library. TanStack Query holds server state, `useState` holds
 
 **Types come from `packages/shared`.** Do not redeclare `Answer` or `GraphNode` in the frontend. If a type needs changing, it changes in shared and both sides see it.
 
-**Never block on the backend.** Dummy data lives in `src/mocks/` from hour one. A flag switches between mock and live. The frontend should be demo-ready before the API exists.
+**Never block on the backend.** Fixtures live in `src/mocks/`. A flag switches between mock and live, so the frontend runs before the API exists.
 
-**Every component handles four states:** loading, empty, error, success. A component that only handles success is not finished. This is written here because it is the single most common cause of a demo breaking on camera.
+**Every component handles four states:** loading, empty, error, success. A component that only handles success is not finished.
 
 **No raw error strings in the UI.** Every failure gets a human sentence and a retry action. The backend spec has a table of failure cases; each one needs a corresponding UI state.
 
-**Desktop only, latest Chrome.** Do not spend an hour on mobile breakpoints. The video is recorded on a laptop. Make sure nothing is catastrophically broken below 1280px, and stop there.
-
-### Why the UI matters here
-
-Best UI is a separate ₹1,00,000 prize and the same submission is automatically considered for it. Nothing extra to enter. That prize is won on clarity, hierarchy and restraint, not animation or gradients. A judge deciding it will be looking at typography, spacing consistency, and whether the empty and error states were thought about at all.
+**Desktop only, latest Chrome.** Nothing should be badly broken below 1280px, but mobile layouts are not a goal.
 
 ## Design direction
 
@@ -45,7 +41,7 @@ The reference points are a good terminal, a well-made IDE panel, a flight instru
 
 ### Dark by default
 
-Developers work in dark themes and a graph of coloured nodes reads better on dark. Build dark first. A light theme is not required this weekend and should not be attempted.
+Developers work in dark themes and a graph of coloured nodes reads better on dark. Dark only. There is no light theme.
 
 ### Three principles
 
@@ -66,11 +62,11 @@ Developers work in dark themes and a graph of coloured nodes reads better on dar
 
 ### Where the shipped app diverges, deliberately
 
-The theme that shipped is a desert night, not the neutral instrument this section describes, and three items on the avoid list above were overruled on purpose. They are recorded here so the next person knows they were decisions, not oversights:
+The theme that shipped is a desert night, not the neutral instrument this section describes, and three items on the avoid list above were overruled on purpose. They are recorded here as decisions, not oversights:
 
-- **Screen 1 is a landing page**, with hero type, a scroll-triggered sandstorm and a section explaining the product. A judge meets the product there before they meet the tool.
+- **Screen 1 is a landing page**, with hero type, a scroll-triggered sandstorm and a section explaining the product. A visitor meets the product there before they meet the tool.
 - **Motion is ambient and slow**: a caravan crosses the horizon over 48s, stars twinkle, dunes glow while a query runs. All of it is disabled under `prefers-reduced-motion`.
-- **Radii reach 12–16px** on cards and panels, and glows and backdrop blur are used as depth.
+- **Radii reach 12 to 16px** on cards and panels, and glows and backdrop blur are used as depth.
 
 What was *not* overruled: dark by default, typography carrying the hierarchy, skeletons over spinners, and the mono rule above.
 
@@ -86,7 +82,7 @@ Define these once as CSS variables. Never hardcode a colour or a spacing value a
 
 ```css
 :root {
-  /* surfaces, darkest to lightest — a desert night */
+  /* surfaces, darkest to lightest: a desert night */
   --sky-deep:  #0A0B14;   /* page, and the darkest panels */
   --sky-mid:   #171833;   /* panels, cards, raised surfaces */
   --dune-far:  #241C2E;   /* hover, pressed, the recommended node */
@@ -112,9 +108,9 @@ These eight variables are the palette, defined in `packages/web/src/index.css`. 
 --font-mono:  'IBM Plex Mono', Menlo, Monaco, Consolas, monospace;
 ```
 
-**Mono-first.** `body` is monospace, so the whole interface is monospace unless something opts out. That inverts the rule the rest of this section was written around: rather than mono marking what comes from the codebase, mono is the default voice of the instrument and everything in it — paths, prose, labels — is set in it. Fraunces, a serif, carries headings and section titles: it is the one warm, non-technical note in the interface. Inter is loaded at 400 for the rare line of running prose (a low-confidence candidate's reason) and is used almost nowhere else.
+**Mono-first.** `body` is monospace, so the whole interface is monospace unless something opts out. That inverts the rule the rest of this section was written around. Rather than mono marking what comes from the codebase, mono is the default voice of the instrument, and everything in it (paths, prose, labels) is set in it. Fraunces, a serif, carries headings and section titles: it is the one warm, non-technical note in the interface. Inter is loaded at 400 for the rare line of running prose (a low-confidence candidate's reason) and is used almost nowhere else.
 
-Fonts load without blocking the first paint: `index.html` preloads the stylesheet and applies it with the `media="print"` swap, and requests only the weights in use — Fraunces 300/400/600, IBM Plex Mono 400/500/600/700 plus italic 400, Inter 400. Adding a weight means editing that URL.
+Fonts load without blocking the first paint: `index.html` preloads the stylesheet and applies it with the `media="print"` swap, and requests only the weights in use: Fraunces 300/400/600, IBM Plex Mono 400/500/600/700 plus italic 400, Inter 400. Adding a weight means editing that URL.
 
 Scale, and use nothing outside it:
 
@@ -130,7 +126,7 @@ Weights: 400 and 600 only. No 500, no 700. Two weights is a constraint that make
 
 ### Spacing
 
-4px base. Use 4, 8, 12, 16, 24, 32, 48 and nothing between them. Inconsistent spacing is the fastest way to look unfinished, and it is what a Best UI judge notices first.
+4px base. Use 4, 8, 12, 16, 24, 32, 48 and nothing between them. Inconsistent spacing is the fastest way to look unfinished.
 
 ### Radius and shadow
 
@@ -152,9 +148,9 @@ Cards and panels get a border, not a shadow.
 
 150ms ease-out for everything. Fade and small translate only. No spring, no bounce, no stagger. Skeletons for loading, never spinners, except inside a button during a submit.
 
-## Screen 1 — Connect a repo
+## Screen 1 · Connect a repo
 
-The first thing a judge sees. It has one job and should look like it has one job.
+The first screen a visitor sees. It has one job and should look like it has one job.
 
 ### Layout
 
@@ -179,7 +175,7 @@ Centred column, max-width 560px, vertically centred in the viewport.
 
 ### The sample repo link matters
 
-It loads the pre-indexed demo repo instantly. A judge who does not want to wait through indexing can be in the product in one click. Put it in from the start; it is also what the video uses.
+It loads a pre-indexed repo instantly, so anyone who does not want to wait through indexing is in the product in one click.
 
 ### Indexing state
 
@@ -222,7 +218,7 @@ The stage that failed stays visible with a red marker. The user should be able t
 
 Navigate straight to Screen 2. No success screen, no confirmation. The map appearing is the confirmation.
 
-## Screen 2 — Map and answers
+## Screen 2 · Map and answers
 
 The main screen. This is where the demo spends most of its time, so it gets the most care.
 
@@ -253,7 +249,7 @@ Top bar: product name, repo name in monospace, file count in `--text-dim`, and a
 - Textarea, two rows, grows to four
 - Placeholder: `Where do I add rate limiting to the auth API?`
 - Enter submits, Shift+Enter newlines
-- Below it, three example questions as clickable chips when no answer is shown yet. This solves the blank-page problem and shows a judge what the product is for without a tutorial.
+- Below it, three example questions as clickable chips when no answer is shown yet. This solves the blank-page problem and shows what the product is for without a tutorial.
 
 ### Answer card
 
@@ -288,7 +284,7 @@ The single most important component in the product. Structure, top to bottom:
 
 **Section labels** are `text-xs`, uppercase, letter-spaced, `--text-muted`. **Values** are `text-base`. This label-value rhythm is what makes it scan like an instrument readout rather than a chat reply.
 
-**Confidence badge:** green for high, amber for medium, grey for low. On low, replace the single recommendation with a list of two or three candidates and a line saying the answer is uncertain. Do not hide uncertainty — showing it reads as engineering maturity.
+**Confidence badge:** green for high, amber for medium, grey for low. On low, replace the single recommendation with two or three candidates and a line saying the answer is uncertain. Do not hide uncertainty.
 
 **Clicking a source** opens a side drawer with that file at the cited lines, syntax highlighted, the cited range marked. This is the verification step from the user flows and it is what makes the product trustworthy rather than another chat box.
 
@@ -303,13 +299,13 @@ The single most important component in the product. Structure, top to bottom:
 
 While a query runs, show a skeleton in the exact shape of the answer card. Not a spinner. The layout should not jump when the answer arrives.
 
-## Screen 3 — Context panel
+## Screen 3 · Context panel
 
 The team's shared memory. This is the differentiator, so it needs to feel substantial rather than like a notes field.
 
 ### Presentation
 
-A full-height drawer sliding from the right, 520px wide, over the map. Not a separate route — the user should feel they are still in the repo.
+A full-height drawer sliding from the right, 520px wide, over the map. Not a separate route, so the user stays in the repo.
 
 ### Layout
 
@@ -353,7 +349,7 @@ A full-height drawer sliding from the right, 520px wide, over the map. Not a sep
 | Type | Label colour | Meaning |
 | --- | --- | --- |
 | Decision | `--info` | A choice that was made and should not be re-litigated |
-| Dead end | `--error` | Something tried and rejected. The most valuable type — it stops an agent suggesting it again. |
+| Dead end | `--error` | Something tried and rejected. The most valuable type, because it stops an agent suggesting it again. |
 | Constraint | `--warn` | A limit the code must respect |
 | Suggested | `--accent` | A draft awaiting approval |
 
@@ -361,7 +357,7 @@ Labels are `text-xs` uppercase. Timestamps are relative and right-aligned in `--
 
 ### Suggestions
 
-Pending suggestions always sort to the top with an amber left border, so they are visually distinct from confirmed items. The body text is editable in place before saving — the point is human-confirmed context, so editing must be one action, not a modal.
+Pending suggestions sort to the top with an amber left border, so they are distinct from confirmed items. The body text is editable in place before saving. The point is human-confirmed context, so editing is one action, not a modal.
 
 After save, the item animates into position in the main list. 150ms, nothing elaborate.
 
@@ -369,11 +365,11 @@ After save, the item animates into position in the main list. 150ms, nothing ela
 
 Opens a modal showing the generated markdown in a monospace block, with a copy button. Copy should be one click and should show a confirmation toast.
 
-Below the markdown, a short line: `Or connect via MCP: <url>`, with the endpoint copyable. This is where the MCP feature becomes visible in the UI rather than being invisible plumbing, which matters because the video needs to show it.
+Below the markdown, a short line: `Or connect via MCP: <url>`, with the endpoint copyable. This is where MCP becomes visible in the UI rather than invisible plumbing.
 
 ### Empty state
 
-Not a blank panel. Show one example item, greyed, with a line explaining what gets stored here and why it is shared with the team. A judge who opens this panel first should still understand the feature.
+Not a blank panel. Show one example item, greyed, with a line explaining what gets stored here and why it is shared. Someone who opens this panel first should still understand the feature.
 
 ## Component inventory
 
@@ -386,10 +382,9 @@ Every component below must handle loading, empty, error and success. A component
 | `GraphView` | `graph`, `highlight`, `onNodeClick` | loading skeleton, empty graph, too many nodes, rendered |
 | `QueryBox` | `onAsk`, `disabled` | idle with examples, typing, submitting |
 | `AnswerCard` | `answer` | skeleton, low confidence variant, no answer found, full answer |
-| `SourceLink` | `path`, `lines` | default, hover, file missing |
 | `FileDrawer` | `path`, `highlightLines` | loading, file not found, loaded |
 | `ContextPanel` | `items`, `suggestions` | loading, empty with example, list, save failed |
-| `ContextItem` | `item` | decision, dead end, constraint, agent-authored badge |
+| `ContextItemCard` | `item` | decision, dead end, constraint, agent-authored badge |
 | `SuggestionCard` | `draft`, `onSave`, `onDismiss` | editable, saving, saved, dismissed |
 | `ExportModal` | `markdown` | generating, ready, copied |
 | `ConfidenceBadge` | `level` | high, medium, low |
@@ -401,7 +396,7 @@ Every component below must handle loading, empty, error and success. A component
 
 **Errors are sentences.** `ErrorState` takes a human message and an action. No component renders `error.message` directly.
 
-**Monospace rule.** Anything originating in the codebase — paths, symbols, line numbers, route paths, code — renders in `--font-mono`. Applied without exception.
+**Monospace rule.** Anything originating in the codebase (paths, symbols, line numbers, route paths, code) renders in `--font-mono`. Applied without exception.
 
 **Agent-authored items** carry a small badge. If an MCP client wrote a context item, a human must be able to see that at a glance.
 
@@ -411,7 +406,7 @@ Frontend can build all of this against mocks before any endpoint exists:
 
 1. Tokens, layout shell, top bar
 2. `RepoInput` and `IndexProgress` against a fake job that advances on a timer
-3. `AnswerCard` against a mock answer — build this early, it is the component the demo lives on
+3. `AnswerCard` against a mock answer. Build this early. It is the component everything else supports
 4. `GraphView` against a mock graph
 5. `ContextPanel` and `SuggestionCard`
 6. `FileDrawer`
@@ -425,7 +420,7 @@ Step 3 before step 4. The answer card matters more to the demo than the graph, a
 
 **React Flow.** Node positions come pre-computed from the backend, so no layout engine is needed in the browser. React Flow handles pan, zoom, custom nodes and edge rendering, and it renders 500 nodes without trouble.
 
-Do not use D3 force simulation. It runs the layout in the browser, it is non-deterministic, and the graph would settle differently on every load — which looks unstable on camera.
+Do not use D3 force simulation. It runs the layout in the browser, it is non-deterministic, and the graph settles differently on every load.
 
 ### Node design
 
@@ -454,7 +449,7 @@ Nodes are grouped by top-level directory, provided by the backend as a cluster l
 
 ### Controls
 
-Bottom left, minimal: zoom in, zoom out, fit to view. No minimap — the graph is not large enough to need one and it adds clutter.
+Bottom left, minimal: zoom in, zoom out, fit to view. No minimap. The graph is not large enough to need one and it adds clutter.
 
 ### Performance guard
 
@@ -462,11 +457,11 @@ Isolated nodes never reach the frontend: the backend always excludes them and re
 
 ### The fallback
 
-If the graph is eating time on Saturday, ship a grouped list view instead: directories as sections, files as rows, with the same highlighting for recommended and affected files. Less impressive, still useful, and it will not be what loses the demo. The answer card is the product; the graph is context around it.
+If the graph is not working out, a grouped list view does the job: directories as sections, files as rows, with the same highlighting for recommended and affected files. Less impressive, still useful. The answer card is the product; the graph is context around it.
 
 ## Working without the backend
 
-The frontend should be demo-ready before a single endpoint exists. This is the whole reason the API contract is frozen on Thursday.
+The frontend runs before a single endpoint exists. That is what the frozen API contract buys.
 
 ### Setup
 
@@ -477,7 +472,8 @@ src/mocks/
   answer-low.json   # low-confidence variant
   context.json      # 3 decisions, 2 dead ends, 1 constraint
   suggestions.json  # 2 pending drafts
-  job.json          # indexing job that advances on a timer
+  meta.json         # the repo record the map and top bar read
+  files.json        # source for the file drawer
 ```
 
 ```ts
@@ -497,7 +493,7 @@ Include at least one path long enough to need eliding, one file with a very shor
 
 Flip the flag. If anything breaks, the contract was not followed by one side or the other, and that is a five-minute fix rather than a rebuild. This is the point of the whole arrangement.
 
-### Integration checklist for Saturday morning
+### Integration checklist
 
 Walk this list with the backend, in order:
 

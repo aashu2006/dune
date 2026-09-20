@@ -1,23 +1,25 @@
-# 03 — API contract
+# 03 · API contract
 
 Dune · CloudSmiths · First Commit (AWS x WeMakeDevs)
 
-Authoritative. If any other doc disagrees with this one, this one wins. Frozen Thursday; changes need both sides to agree.
+Authoritative. If any other doc disagrees with this one, this one wins. Frozen before implementation started; changes need both sides to agree.
 
 ## Conventions
 
 ### Base
 
 ```
-Production:  https://api.dune.<domain>/v1
-Local:       http://localhost:3000/v1
+Deployed:  https://ivaqlw3t8d.execute-api.ap-south-1.amazonaws.com/v1
+Local:     sam local start-api, then http://localhost:3000/v1
 ```
+
+The deployed base is the `ApiUrl` output of the `dune` stack. The web app takes it from `VITE_API_URL` and appends `/v1` itself.
 
 All requests and responses are JSON. All timestamps are ISO 8601 UTC strings.
 
 ### Rules both sides must follow
 
-**Never omit a key.** If a value is unknown or not applicable, send `null`. The frontend destructures these objects and a missing key is a crash mid-demo; a null is a rendered dash.
+**Never omit a key.** If a value is unknown or not applicable, send `null`. The frontend destructures these objects, so a missing key is a crash and a null is a rendered dash.
 
 **Arrays are never null.** An empty array is `[]`. This removes an entire class of null checks from the UI.
 
@@ -27,7 +29,7 @@ All requests and responses are JSON. All timestamps are ISO 8601 UTC strings.
 
 ### teamId
 
-No auth this weekend. `teamId` is passed as a query parameter and defaults to `demo`. Everyone sharing the link shares the team. This is a deliberate scope cut, stated in the PRD, and it should be said plainly in the demo rather than implied away.
+There is no auth. `teamId` is passed as a query parameter and defaults to `demo`, so everyone sharing the link shares the team. A deliberate scope cut, stated in the PRD and worth stating plainly rather than implying away.
 
 ### Error format
 
@@ -64,7 +66,7 @@ Every non-2xx response, without exception:
 
 `retryable` drives whether the UI shows a retry button. The frontend does not decide this; the backend states it.
 
-`INVALID_REQUEST` means the request body is missing, is not JSON, or fails validation — an empty question, for example. Any endpoint that takes a body can return it, and retrying the same request will not help.
+`INVALID_REQUEST` means the request body is missing, is not JSON, or fails validation, an empty question for example. Any endpoint that takes a body can return it, and retrying the same request will not help.
 
 ## Shared types
 
@@ -238,7 +240,7 @@ Polled every 1.5s during indexing, then once on load.
 
 **Response 200, failed**
 
-Stage is `failed`, `failedStage` names where it broke, `failureReason` is a human sentence. Still a 200 — the request succeeded, the job did not. The frontend renders the failure state from the body, not from an HTTP code.
+Stage is `failed`, `failedStage` names where it broke, `failureReason` is a human sentence. Still a 200, because the request succeeded and the job did not. The frontend renders the failure state from the body, not from an HTTP code.
 
 **Errors:** `NOT_FOUND` (the repo has never been submitted)
 
@@ -252,7 +254,7 @@ File contents for the source drawer.
 { "path": "src/routes/auth.ts", "content": "...", "lineCount": 84, "language": "ts" }
 ```
 
-`language` is one of `ts`, `tsx`, `js`, `jsx`, `py` — the indexed languages.
+`language` is one of `ts`, `tsx`, `js`, `jsx`, `py`, the indexed languages.
 
 **Errors:** `NOT_FOUND` if the path is not in the indexed set. The frontend shows a "file not available" state rather than an empty drawer.
 
@@ -406,7 +408,7 @@ Generate drafts from the diff between the indexed commit and current HEAD.
 
 `since` compares that commit with HEAD instead of the indexed commit. It exists for demos and testing, where the repo may not have moved since it was indexed. Without a body, the indexed commit is used.
 
-**Response 200:** an object with a suggestions array, capped at 5. It holds every pending suggestion for the repo, new ones included, and there are never more than 5 pending at once — a refresh only drafts enough to fill the free slots. Drafts that repeat an existing context item or any earlier suggestion, dismissed ones included, are discarded.
+**Response 200:** an object with a suggestions array, capped at 5. It holds every pending suggestion for the repo, new ones included, and there are never more than 5 pending at once, because a refresh only drafts enough to fill the free slots. Drafts that repeat an existing context item or any earlier suggestion, dismissed ones included, are discarded.
 
 Synchronous and may take several seconds. The frontend shows a loading state on the refresh control.
 
@@ -432,7 +434,7 @@ Export never fails on empty context. With nothing saved, it returns the repo str
 
 The MCP server is a thin wrapper over the HTTP API above. No duplicated logic, no second retrieval path.
 
-**Transport:** remote, Streamable HTTP (stateless), at `{API base}/mcp` on the same HTTP API as everything above — `POST` only. The design was SSE on App Runner; App Runner is not available to our AWS account, so the server runs as a Lambda, which cannot hold SSE sessions. Streamable HTTP is also what the MCP spec now recommends over SSE. See `01-BACKEND.md`, "MCP server".
+**Transport:** remote, Streamable HTTP (stateless), `POST` only, at `{API base}/mcp` on the same HTTP API as everything above. The design was SSE on App Runner. App Runner is not available to this AWS account, so the server runs as a Lambda, which cannot hold SSE sessions, and Streamable HTTP is what the MCP spec now recommends anyway. See `01-BACKEND.md`, "MCP server".
 
 **Connection URL parameters,** both optional: `teamId` (default `demo`, as in the API) and `repoId`, a default repo for the connection. With `repoId` on the URL, `repoId` may be left out of every tool call.
 
@@ -472,7 +474,7 @@ Calls POST /context with authoredBy set to agent. Returns a confirmation and the
 
 Anything written through save\_decision is stored with `authoredBy: "agent"` and badged in the UI. A human must always be able to tell which parts of the team's record a model wrote.
 
-This is a deliberate design position, not an implementation detail. The value of the context layer is that it can be trusted, and a record the team cannot distinguish from a model's guesses is not trustworthy. Say this in the demo if the MCP feature is shown.
+This is a design position, not an implementation detail. The value of the context layer is that it can be trusted, and a record the team cannot tell apart from a model's guesses is not trustworthy.
 
 ### Behaviour before indexing completes
 
@@ -480,4 +482,4 @@ If an agent calls any tool while indexing is still running, return a normal resp
 
 ### If it does not ship
 
-MCP is last in the build order and is dropped without discussion if the core is not solid by Saturday night. Nothing else depends on it, and the export button covers the same need with a copy-paste.
+MCP is last in the build order and can be dropped. Nothing else depends on it, and the export button covers the same need with a copy-paste.
